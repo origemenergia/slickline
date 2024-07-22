@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equalização de Níveis de Líquido</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .calculator {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input, select {
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>Equalização de Níveis de Líquido</h1>
+        <label for="nivelColuna">Nível na Coluna (m):</label>
+        <input type="number" id="nivelColuna" placeholder="Nível na Coluna (m)">
+        
+        <label for="nivelAnular">Nível no Anular (m):</label>
+        <input type="number" id="nivelAnular" placeholder="Nível no Anular (m)">
+        
+        <label for="pressaoAnular">Pressão no Anular (kgf/cm²):</label>
+        <input type="number" id="pressaoAnular" placeholder="Pressão no Anular (kgf/cm²)">
+        
+        <label for="pressaoColuna">Pressão na Coluna (kgf/cm²):</label>
+        <input type="number" id="pressaoColuna" placeholder="Pressão na Coluna (kgf/cm²)">
+        
+        <label for="pesosConhecidos">Os pesos dos fluidos são conhecidos?</label>
+        <select id="pesosConhecidos" onchange="mostrarPesos()">
+            <option value="nao">Não</option>
+            <option value="sim">Sim</option>
+        </select>
+        
+        <div id="pesos" class="hidden">
+            <label for="pesoAnular">Peso do fluido no Anular (kg/m³):</label>
+            <input type="number" id="pesoAnular" placeholder="Peso do fluido no Anular (kg/m³)">
+            
+            <label for="pesoColuna">Peso do fluido na Coluna (kg/m³):</label>
+            <input type="number" id="pesoColuna" placeholder="Peso do fluido na Coluna (kg/m³)">
+        </div>
+        
+        <button onclick="calcular()">Calcular</button>
+        <p id="resultado"></p>
+    </div>
+    <script>
+        function mostrarPesos() {
+            const pesosDiv = document.getElementById('pesos');
+            const pesosConhecidos = document.getElementById('pesosConhecidos').value;
+            if (pesosConhecidos === 'sim') {
+                pesosDiv.classList.remove('hidden');
+            } else {
+                pesosDiv.classList.add('hidden');
+            }
+        }
+
+        function calcular() {
+            const nivelColuna = parseFloat(document.getElementById('nivelColuna').value);
+            const nivelAnular = parseFloat(document.getElementById('nivelAnular').value);
+            const pressaoAnular = parseFloat(document.getElementById('pressaoAnular').value);
+            const pressaoColuna = parseFloat(document.getElementById('pressaoColuna').value);
+            const pesosConhecidos = document.getElementById('pesosConhecidos').value;
+
+            let pesoAnular = 1000; // peso padrão em kg/m³
+            let pesoColuna = 1000; // peso padrão em kg/m³
+
+            if (pesosConhecidos === 'sim') {
+                pesoAnular = parseFloat(document.getElementById('pesoAnular').value);
+                pesoColuna = parseFloat(document.getElementById('pesoColuna').value);
+            }
+
+            // Calcular o balanço
+            const pressaoCalculadaColuna = nivelColuna * pesoColuna / 10000 + pressaoColuna;
+            const pressaoCalculadaAnular = nivelAnular * pesoAnular / 10000 + pressaoAnular;
+
+            let resultado = '';
+            if (pressaoCalculadaColuna > pressaoCalculadaAnular) {
+                resultado = 'Balanço positivo para a coluna (situação ideal).';
+            } else {
+                resultado = 'Balanço para o anular (situação negativa).';
+            }
+
+            document.getElementById('resultado').innerText = resultado;
+        }
+    </script>
+</body>
+</html>
