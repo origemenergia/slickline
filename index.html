@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SLICKLINE | Equalização de Níveis de Líquido</title>
+    <link rel="icon" href="icone.png" type="image/png"> <!-- Adiciona o favicon -->
     <style>
-
         @font-face {
             font-family: 'Graphie';
             src: url('Graphie-Regular.otf2') format('otf2'), 
@@ -18,7 +18,7 @@
                  url('Graphie-Bold.otf') format('otf');
             font-weight: bold;
         }
-        
+
         body {
             font-family: 'Graphie', Arial, sans-serif;
             display: flex;
@@ -26,18 +26,32 @@
             align-items: center;
             height: 100vh;
             background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
         }
         .calculator {
             background-color: white;
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px; /* Define a largura máxima */
+            box-sizing: border-box; /* Inclui padding e border no cálculo da largura total */
         }
         input, select {
             margin: 5px 0;
             padding: 10px;
             font-size: 16px;
             width: 100%;
+            box-sizing: border-box; /* Inclui padding no cálculo da largura */
+            input[type="number"] {
+                -moz-appearance: textfield; /* Remove setas de número no Firefox */
+            }
+            input[type="number"]::-webkit-outer-spin-button,
+            input[type="number"]::-webkit-inner-spin-button {
+                -webkit-appearance: none; /* Remove setas de número no Chrome e Safari */
+                margin: 0; /* Remove margem */
+            }
         }
         button {
             padding: 10px;
@@ -58,10 +72,20 @@
             display: none;
         }
         .logo {
-            width: 300px;
-            position: absolute;
-            top: 10px;
-            left: 10px;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 20px; /* Adiciona espaço abaixo da logo */
+            display: block;
+            position: relative;
+            left: 0;
+            top: 0;
+        }
+
+        /* Media Queries para dispositivos móveis */
+        @media (max-width: 600px) {
+            .logo {
+                width: 80%; /* Ajusta a largura da logo em telas menores */
+            }
         }
     </style>
 </head>
@@ -70,16 +94,16 @@
     <div class="calculator">
         <h1>SLICKLINE | Equalização de Níveis de Líquido</h1>
         <label for="nivelColuna">Nível na Coluna (m):</label>
-        <input type="number" id="nivelColuna" placeholder="Nível na Coluna (m)">
+        <input type="number" id="nivelColuna" inputmode="numeric">
         
         <label for="nivelAnular">Nível no Anular (m):</label>
-        <input type="number" id="nivelAnular" placeholder="Nível no Anular (m)">
+        <input type="number" id="nivelAnular" inputmode="numeric">
         
         <label for="pressaoAnular">Pressão no Anular (kgf/cm²):</label>
-        <input type="number" id="pressaoAnular" placeholder="Pressão no Anular (kgf/cm²)">
+        <input type="number" id="pressaoAnular" inputmode="numeric">
         
         <label for="pressaoColuna">Pressão na Coluna (kgf/cm²):</label>
-        <input type="number" id="pressaoColuna" placeholder="Pressão na Coluna (kgf/cm²)">
+        <input type="number" id="pressaoColuna" inputmode="numeric">
         
         <label for="pesosConhecidos">Os pesos dos fluidos são conhecidos?</label>
         <select id="pesosConhecidos" onchange="mostrarPesos()">
@@ -89,10 +113,10 @@
         
         <div id="pesos" class="hidden">
             <label for="pesoAnular">Peso do fluido no Anular (kg/m³):</label>
-            <input type="number" id="pesoAnular" placeholder="Peso do fluido no Anular (kg/m³)">
+            <input type="number" id="pesoAnular" inputmode="numeric">
             
             <label for="pesoColuna">Peso do fluido na Coluna (kg/m³):</label>
-            <input type="number" id="pesoColuna" placeholder="Peso do fluido na Coluna (kg/m³)">
+            <input type="number" id="pesoColuna" inputmode="numeric">
         </div>
         
         <button onclick="calcular()">Calcular</button>
