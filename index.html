@@ -219,7 +219,11 @@
                     cor = 'orange';
                 }
             } else {
-                resultado = 'Pressão hidrostática do anular maior do que da coluna, operação insegura. Necessário injetar X bbl com a UCAQ antes de prosseguir com a operação. Consultar engenharia antes de prosseguir.';
+                // Calcular o volume a ser injetado (X)
+                const pressaoHidAnularDesejada = pressaoHidAnular * 1.1;
+                const volumeInjetado = ((pressaoHidAnularDesejada - pressaoColuna) * 10000) / (massaEspecificaColuna * gravidade);
+
+                resultado = `Pressão hidrostática do anular maior do que da coluna, operação insegura. Necessário injetar ${volumeInjetado.toFixed(2)} bbl com a UCAQ antes de prosseguir com a operação. Consultar engenharia antes de prosseguir.`;
                 cor = 'red';
             }
 
