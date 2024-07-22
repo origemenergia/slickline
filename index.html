@@ -3,10 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Equalização de Níveis de Líquido</title>
+    <title>SLICKLINE - Equalização de Níveis de Líquido</title>
     <style>
+        @font-face {
+            font-family: 'Graphie';
+            src: url('https://path-to-your-fonts/Graphie-Regular.woff2') format('woff2'), 
+                 url('https://path-to-your-fonts/Graphie-Regular.woff') format('woff');
+            font-weight: normal;
+        }
+        @font-face {
+            font-family: 'Graphie';
+            src: url('https://path-to-your-fonts/Graphie-Bold.woff2') format('woff2'), 
+                 url('https://path-to-your-fonts/Graphie-Bold.woff') format('woff');
+            font-weight: bold;
+        }
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Graphie', Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -31,15 +43,30 @@
             width: 100%;
             margin: 5px 0;
             cursor: pointer;
+            background-color: rgb(25, 60, 185);
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        h1 {
+            color: rgb(25, 60, 185);
+            font-weight: bold;
         }
         .hidden {
             display: none;
         }
+        .logo {
+            width: 100px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
     </style>
 </head>
 <body>
+    <img src="logo.jpg" alt="Origem Logo" class="logo">
     <div class="calculator">
-        <h1>Equalização de Níveis de Líquido</h1>
+        <h1>SLICKLINE - Equalização de Níveis de Líquido</h1>
         <label for="nivelColuna">Nível na Coluna (m):</label>
         <input type="number" id="nivelColuna" placeholder="Nível na Coluna (m)">
         
