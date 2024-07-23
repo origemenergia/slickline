@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SLICKLINE | Equalização de Níveis de Líquido</title>
-    <link rel="icon" href="icone.png" type="image/png"> <!-- Favicon -->
+    <link rel="icon" href="https://raw.githubusercontent.com/adlehrgabriele/favicon/main/icone.png" type="image/png">
     <style>
         @font-face {
             font-family: 'Graphie';
@@ -22,7 +22,6 @@
         body {
             font-family: 'Graphie', Arial, sans-serif;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
@@ -80,7 +79,7 @@
             display: none;
         }
         .calculator .logo {
-            width: 220px; /* Aumentado para 150px */
+            width: 150px; /* Aumentei o tamanho da logo */
             margin-bottom: 20px;
         }
         .calculator .error {
@@ -95,10 +94,9 @@
             margin-top: 20px;
         }
         .footer {
-            font-size: 10px; /* Fonte menor */
-            color: rgba(0, 0, 0, 0.6); /* Opacidade de 60% */
-            text-align: center;
-            margin-top: 10px;
+            font-size: 10px;
+            color: rgba(0, 0, 0, 0.5); /* Opacidade */
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -106,39 +104,36 @@
     <div class="calculator">
         <img src="logo.png" alt="Origem Logo" class="logo">
         <h1>SLICKLINE | Equalização de Níveis de Líquido</h1>
-        <label for="profundidade">Profundidade do poço (m):</label>
-        <input type="number" id="profundidade" inputmode="decimal">
-        <span class="error" id="errorProfundidade"></span>
-
-        <label for="nivel_coluna">Nível na Coluna (m):</label>
-        <input type="number" id="nivel_coluna" inputmode="decimal">
+        <label for="nivelColuna">Nível na Coluna (m):</label>
+        <input type="number" id="nivelColuna" inputmode="numeric">
         <span class="error" id="errorNivelColuna"></span>
         
-        <label for="nivel_anular">Nível no Anular (m):</label>
-        <input type="number" id="nivel_anular" inputmode="decimal">
+        <label for="nivelAnular">Nível no Anular (m):</label>
+        <input type="number" id="nivelAnular" inputmode="numeric">
         <span class="error" id="errorNivelAnular"></span>
-
-        <label for="diametro_coluna">Diâmetro da Coluna (polegadas):</label>
-        <select id="diametro_coluna">
-            <option value="2.375">2 3/8"</option>
-            <option value="2.875">2 7/8"</option>
-            <option value="3">3"</option>
-        </select>
-
-        <label for="massaConhecida">A massa específica dos fluidos é conhecida?</label>
-        <select id="massaConhecida" onchange="mostrarMassas()">
+        
+        <label for="pressaoAnular">Pressão no Anular (kgf/cm²):</label>
+        <input type="number" id="pressaoAnular" inputmode="numeric">
+        <span class="error" id="errorPressaoAnular"></span>
+        
+        <label for="pressaoColuna">Pressão na Coluna (kgf/cm²):</label>
+        <input type="number" id="pressaoColuna" inputmode="numeric">
+        <span class="error" id="errorPressaoColuna"></span>
+        
+        <label for="pesosConhecidos">Os pesos dos fluidos são conhecidos?</label>
+        <select id="pesosConhecidos" onchange="mostrarPesos()">
             <option value="nao">Não</option>
             <option value="sim">Sim</option>
         </select>
         
-        <div id="massas" class="hidden">
-            <label for="massa_anular">Massa específica do fluido no Anular (kg/m³):</label>
-            <input type="number" id="massa_anular" inputmode="decimal">
-            <span class="error" id="errorMassaAnular"></span>
+        <div id="pesos" class="hidden">
+            <label for="pesoAnular">Peso do fluido no Anular (kg/m³):</label>
+            <input type="number" id="pesoAnular" inputmode="numeric">
+            <span class="error" id="errorPesoAnular"></span>
             
-            <label for="massa_coluna">Massa específica do fluido na Coluna (kg/m³):</label>
-            <input type="number" id="massa_coluna" inputmode="decimal">
-            <span class="error" id="errorMassaColuna"></span>
+            <label for="pesoColuna">Peso do fluido na Coluna (kg/m³):</label>
+            <input type="number" id="pesoColuna" inputmode="numeric">
+            <span class="error" id="errorPesoColuna"></span>
         </div>
         
         <button onclick="calcular()">Calcular</button>
@@ -148,13 +143,13 @@
         Todos os direitos reservados © 2024 Anália Ramila e Adlehr Gabriele | Origem Energia S.A.
     </div>
     <script>
-        function mostrarMassas() {
-            const massasDiv = document.getElementById('massas');
-            const massaConhecida = document.getElementById('massaConhecida').value;
-            if (massaConhecida === 'sim') {
-                massasDiv.classList.remove('hidden');
+        function mostrarPesos() {
+            const pesosDiv = document.getElementById('pesos');
+            const pesosConhecidos = document.getElementById('pesosConhecidos').value;
+            if (pesosConhecidos === 'sim') {
+                pesosDiv.classList.remove('hidden');
             } else {
-                massasDiv.classList.add('hidden');
+                pesosDiv.classList.add('hidden');
             }
         }
 
@@ -168,70 +163,65 @@
         }
 
         function calcular() {
-            const profundidade = parseFloat(document.getElementById('profundidade').value);
-            const nivelColuna = parseFloat(document.getElementById('nivel_coluna').value);
-            const nivelAnular = parseFloat(document.getElementById('nivel_anular').value);
-            const massaConhecida = document.getElementById('massaConhecida').value;
-            const diametroColuna = parseFloat(document.getElementById('diametro_coluna').value);
+            const nivelColuna = parseFloat(document.getElementById('nivelColuna').value);
+            const nivelAnular = parseFloat(document.getElementById('nivelAnular').value);
+            const pressaoAnular = parseFloat(document.getElementById('pressaoAnular').value);
+            const pressaoColuna = parseFloat(document.getElementById('pressaoColuna').value);
+            const pesosConhecidos = document.getElementById('pesosConhecidos').value;
 
-            let massaColuna = 900; // valor padrão em kg/m³
-            let massaAnular = 1006.54; // valor padrão em kg/m³
+            let pesoAnular = 1000; // peso padrão em kg/m³
+            let pesoColuna = 1000; // peso padrão em kg/m³
 
             let isValid = true;
-            isValid &= validarEntrada(profundidade, 'errorProfundidade');
             isValid &= validarEntrada(nivelColuna, 'errorNivelColuna');
             isValid &= validarEntrada(nivelAnular, 'errorNivelAnular');
+            isValid &= validarEntrada(pressaoAnular, 'errorPressaoAnular');
+            isValid &= validarEntrada(pressaoColuna, 'errorPressaoColuna');
 
-            if (massaConhecida === 'sim') {
-                massaColuna = parseFloat(document.getElementById('massa_coluna').value);
-                massaAnular = parseFloat(document.getElementById('massa_anular').value);
-                isValid &= validarEntrada(massaColuna, 'errorMassaColuna');
-                isValid &= validarEntrada(massaAnular, 'errorMassaAnular');
+            if (pesosConhecidos === 'sim') {
+                pesoAnular = parseFloat(document.getElementById('pesoAnular').value);
+                pesoColuna = parseFloat(document.getElementById('pesoColuna').value);
+                isValid &= validarEntrada(pesoAnular, 'errorPesoAnular');
+                isValid &= validarEntrada(pesoColuna, 'errorPesoColuna');
             }
 
             if (!isValid) {
                 return;
             }
 
-            const gravidade = 9.80665;  // Aceleração devido à gravidade em m/s²
-            const profundidadeColuna = profundidade - nivelColuna;
-            const profundidadeAnular = profundidade - nivelAnular;
+            // Calcular o balanço
+            const pressaoHidColuna = nivelColuna * pesoColuna / 10000 + pressaoColuna;
+            const pressaoHidAnular = nivelAnular * pesoAnular / 10000 + pressaoAnular;
+            const pressaoHidAnularAlvo = pressaoHidAnular * 1.1;
 
-            const pressaoHidColuna = massaColuna * gravidade * profundidadeColuna;
-            const pressaoHidAnular = massaAnular * gravidade * profundidadeAnular;
-            const pressaoHidAnularAlvo = 1.1 * pressaoHidAnular;
-            const pressaoHidColuna_kgf = pressaoHidColuna / 98070;
-            const pressaoHidAnular_kgf = pressaoHidAnular / 98070;
-            const pressaoHidAnularAlvo_kgf = pressaoHidAnularAlvo / 98070;
+            const pressaoHidColuna_kgf = pressaoHidColuna / 9.81;
+            const pressaoHidAnular_kgf = pressaoHidAnular / 9.81;
+            const pressaoHidAnularAlvo_kgf = pressaoHidAnularAlvo / 9.81;
 
-            const xTotal = pressaoHidAnularAlvo / (massaColuna * gravidade);
-            const alturaNecessaria = xTotal - profundidadeColuna;
-
-            const raioColuna = (diametroColuna * 0.0254) / 2;
-            const areaColuna = Math.PI * Math.pow(raioColuna, 2);
-            const volumeInjetar = areaColuna * alturaNecessaria;
-            const volumeInjetarBBL = volumeInjetar * 6.28981;
+            const alturaNecessaria = (pressaoHidAnularAlvo - pressaoHidColuna) * 10000 / pesoColuna;
+            const volumeInjetar = alturaNecessaria * Math.PI * Math.pow(2.375 / 2, 2);
+            const volumeInjetarBBL = volumeInjetar / 158.987;
 
             const resultadoDiv = document.getElementById('resultado');
             resultadoDiv.innerHTML = '';
-            
+
             if (pressaoHidColuna > pressaoHidAnularAlvo) {
                 resultadoDiv.innerHTML += '<p style="color: green;">Pressão hidrostática da coluna maior do que 1.1 vezes a do anular, operação segura.</p>';
             } else {
                 if (pressaoHidColuna >= pressaoHidAnular) {
                     resultadoDiv.innerHTML += '<p style="color: orange;">Pressão hidrostática da coluna ligeiramente maior do que a do anular. Consultar engenharia para saber se deve seguir a operação sem completar a coluna dado que o valor, apesar de positivo, está próximo da margem de erro.</p>';
-            } else {
-                resultadoDiv.innerHTML += `<p style="color: red;">Pressão hidrostática do anular maior do que da coluna, operação insegura. Necessário injetar ${volumeInjetarBBL.toFixed(2)} bbl com a UCAQ antes de prosseguir com a operação. Consultar engenharia antes de prosseguir.</p>`;
-            }
-        
-            resultadoDiv.innerHTML += `<p>PH da coluna: ${pressaoHidColuna_kgf.toFixed(2)} kgf/cm²</p>`;
-            resultadoDiv.innerHTML += `<p>PH do anular: ${pressaoHidAnular_kgf.toFixed(2)} kgf/cm²</p>`;
-            resultadoDiv.innerHTML += `<p>Quanto deve ser a PH mínima da coluna com margem de erro: ${pressaoHidAnularAlvo_kgf.toFixed(2)} kgf/cm²</p>`;
-            resultadoDiv.innerHTML += `<p>Altura total necessária da coluna de líquido com margem de erro: ${xTotal.toFixed(2)} m</p>`;
-            resultadoDiv.innerHTML += `<p>Altura de líquido a ser injetada: ${alturaNecessaria.toFixed(2)} m</p>`;
-            resultadoDiv.innerHTML += `<p>Volume a ser injetado: ${volumeInjetar.toFixed(2)} m³ (${volumeInjetarBBL.toFixed(2)} bbl)</p>`;
-}
+                } else {
+                    resultadoDiv.innerHTML += `<p style="color: red;">Pressão hidrostática do anular maior do que da coluna, operação insegura. Necessário injetar ${volumeInjetarBBL.toFixed(2)} bbl com a UCAQ antes de prosseguir com a operação. Consultar engenharia antes de prosseguir.</p>`;
+                }
 
+                resultadoDiv.innerHTML += `<p>PH da coluna: ${pressaoHidColuna_kgf.toFixed(2)} kgf/cm²</p>`;
+                resultadoDiv.innerHTML += `<p>PH do anular: ${pressaoHidAnular_kgf.toFixed(2)} kgf/cm²</p>`;
+                resultadoDiv.innerHTML += `<p>Quanto deve ser a PH mínima da coluna com margem de erro: ${pressaoHidAnularAlvo_kgf.toFixed(2)} kgf/cm²</p>`;
+                resultadoDiv.innerHTML += `<p>Altura total necessária da coluna de líquido com margem de erro: ${alturaNecessaria.toFixed(2)} m</p>`;
+                resultadoDiv.innerHTML += `<p>Altura de líquido a ser injetada: ${alturaNecessaria.toFixed(2)} m</p>`;
+                resultadoDiv.innerHTML += `<p>Volume a ser injetado: ${volumeInjetar.toFixed(2)} m³ (${volumeInjetarBBL.toFixed(2)} bbl)</p>`;
+            }
+        }
     </script>
 </body>
 </html>
