@@ -125,6 +125,22 @@
             <option value="3">3"</option>
         </select>
 
+        <label for="pi_igual">O PI indica que as pressões de anular e coluna são iguais?</label>
+        <select id="pi_igual" onchange="mostrarPressaoPI()">
+            <option value="nao">Não</option>
+            <option value="sim">Sim</option>
+        </select>
+
+        <div id="pressaoPI" class="hidden">
+            <label for="pressao_coluna">Pressão na Coluna (kgf/cm²):</label>
+            <input type="number" id="pressao_coluna" inputmode="decimal">
+            <span class="error" id="errorPressaoColuna"></span>
+
+            <label for="pressao_anular">Pressão no Anular (kgf/cm²):</label>
+            <input type="number" id="pressao_anular" inputmode="decimal">
+            <span class="error" id="errorPressaoAnular"></span>
+        </div>
+
         <label for="massaConhecida">A massa específica dos fluidos é conhecida?</label>
         <select id="massaConhecida" onchange="mostrarMassas()">
             <option value="nao">Não</option>
@@ -148,6 +164,16 @@
         Todos os direitos reservados © 2024 Anália Ramila e Adlehr Gabriele | Origem Energia S.A.
     </div>
     <script>
+        function mostrarPressaoPI() {
+            const pressaoPIDiv = document.getElementById('pressaoPI');
+            const piIgual = document.getElementById('pi_igual').value;
+            if (piIgual === 'sim') {
+                pressaoPIDiv.classList.remove('hidden');
+            } else {
+                pressaoPIDiv.classList.add('hidden');
+            }
+        }
+
         function mostrarMassas() {
             const massasDiv = document.getElementById('massas');
             const massaConhecida = document.getElementById('massaConhecida').value;
@@ -173,63 +199,69 @@
             const nivelAnular = parseFloat(document.getElementById('nivel_anular').value);
             const massaConhecida = document.getElementById('massaConhecida').value;
             const diametroColuna = parseFloat(document.getElementById('diametro_coluna').value);
+            const piIgual = document.getElementById('pi_igual').value;
 
             let massaColuna = 900; // valor padrão em kg/m³
             let massaAnular = 1006.54; // valor padrão em kg/m³
+
+            let pressaoColuna = 0;
+            let pressaoAnular = 0;
 
             let isValid = true;
             isValid &= validarEntrada(profundidade, 'errorProfundidade');
             isValid &= validarEntrada(nivelColuna, 'errorNivelColuna');
             isValid &= validarEntrada(nivelAnular, 'errorNivelAnular');
 
+            if (piIgual === 'sim') {
+                pressaoColuna = parseFloat(document.getElementById('pressao_coluna').value) * 98066.5; // converter de kgf/cm² para Pa
+                pressaoAnular = parseFloat(document.getElementById('pressao_anular').value) * 98066.5; // converter de kgf/cm² para Pa
+                isValid &= validarEntrada(pressaoColuna, 'errorPressaoColuna');
+                isValid &= validarEntrada(pressaoAnular, 'errorPressaoAnular');
+            }
+
             if (massaConhecida === 'sim') {
-                massaColuna = parseFloat(document.getElementById('massa_coluna').value);
                 massaAnular = parseFloat(document.getElementById('massa_anular').value);
-                isValid &= validarEntrada(massaColuna, 'errorMassaColuna');
+                massaColuna = parseFloat(document.getElementById('massa_coluna').value);
                 isValid &= validarEntrada(massaAnular, 'errorMassaAnular');
+                isValid &= validarEntrada(massaColuna, 'errorMassaColuna');
             }
 
             if (!isValid) {
+                document.getElementById('resultado').innerText = '';
                 return;
             }
 
-            const gravidade = 9.80665;  // Aceleração devido à gravidade em m/s²
-            const profundidadeColuna = profundidade - nivelColuna;
-            const profundidadeAnular = profundidade - nivelAnular;
+            const g = 9.80665; // aceleração da gravidade em m/s²
 
-            const pressaoHidColuna = massaColuna * gravidade * profundidadeColuna;
-            const pressaoHidAnular = massaAnular * gravidade * profundidadeAnular;
-            const pressaoHidAnularAlvo = 1.1 * pressaoHidAnular;
-            const pressaoHidColuna_kgf = pressaoHidColuna / 98070;
-            const pressaoHidAnular_kgf = pressaoHidAnular / 98070;
-            const pressaoHidAnularAlvo_kgf = pressaoHidAnularAlvo / 98070;
+            const densidadeRelativaAnular = massaAnular / 1000;
+            const densidadeRelativaColuna = massaColuna / 1000;
 
-            
-            const xTotal = pressaoHidAnularAlvo / (massaColuna * gravidade);
-            const alturaNecessaria = xTotal - profundidadeColuna;
+            const pressaoHidraulicaAnular = densidadeRelativaAnular * g * (profundidade - nivelAnular);
+            const pressaoHidraulicaColuna = densidadeRelativaColuna * g * (profundidade - nivelColuna);
 
-            const raioColuna = (diametroColuna * 0.0254) / 2;
-            const areaColuna = Math.PI * Math.pow(raioColuna, 2);
-            const volumeInjetar = areaColuna * alturaNecessaria;
-            const volumeInjetarBBL = volumeInjetar * 6.28981;
+            const pressaoTotalAnular = pressaoHidraulicaAnular + pressaoAnular;
+            const pressaoTotalColuna = pressaoHidraulicaColuna + pressaoColuna;
 
-            const resultadoDiv = document.getElementById('resultado');
-            resultadoDiv.innerHTML = '';
+            const fatorSeguranca = 1.1 * pressaoTotalAnular;
 
-            if (pressaoHidColuna > pressaoHidAnularAlvo) {
-                resultadoDiv.innerHTML += '<p style="color: green;">Pressão hidrostática da coluna maior do que 1.1 vezes a do anular, operação segura.</p>';
-            } else if (pressaoHidColuna >= pressaoHidAnular) {
-                resultadoDiv.innerHTML += '<p style="color: orange;">Pressão hidrostática da coluna ligeiramente maior do que a do anular. Consultar engenharia para saber se deve seguir a operação sem completar a coluna dado que o valor, apesar de positivo, está próximo da margem de erro.</p>';
+            let resultado = "";
+
+            if (pressaoTotalColuna > fatorSeguranca) {
+                resultado = "Operação segura. Nenhuma ação necessária.";
+                document.getElementById('resultado').style.color = 'green';
+            } else if (pressaoTotalColuna > pressaoTotalAnular) {
+                resultado = "Operação segura, mas está dentro de 10% do limite. Consulte a engenharia.";
+                document.getElementById('resultado').style.color = 'yellow';
             } else {
-                resultadoDiv.innerHTML += `<p style="color: red;">Pressão hidrostática do anular maior do que da coluna, operação insegura. Necessário injetar ${volumeInjetarBBL.toFixed(2)} bbl com a UCAQ antes de prosseguir com a operação. Consultar engenharia antes de prosseguir.</p>`;
+                const alturaNecessaria = (fatorSeguranca - pressaoTotalColuna) / (densidadeRelativaColuna * g);
+                const areaColuna = Math.PI * Math.pow(diametroColuna / 2, 2) * 0.00064516; // conversão de polegadas quadradas para metros quadrados
+                const volumeNecessario = alturaNecessaria * areaColuna * 6.28981; // conversão de metros cúbicos para barris
+
+                resultado = `Operação insegura. Necessário injetar aproximadamente ${volumeNecessario.toFixed(2)} barris de fluido.`;
+                document.getElementById('resultado').style.color = 'red';
             }
 
-            resultadoDiv.innerHTML += `<p>PH da coluna: ${pressaoHidColuna_kgf.toFixed(2)} kgf/cm²</p>`;
-            resultadoDiv.innerHTML += `<p>PH do anular: ${pressaoHidAnular_kgf.toFixed(2)} kgf/cm²</p>`;
-            resultadoDiv.innerHTML += `<p>Quanto deve ser a PH mínima da coluna com margem de erro: ${pressaoHidAnularAlvo_kgf.toFixed(2)} kgf/cm²</p>`;
-            resultadoDiv.innerHTML += `<p>Altura total necessária da coluna de líquido com margem de erro: ${xTotal.toFixed(2)} m</p>`;
-            resultadoDiv.innerHTML += `<p>Altura de líquido a ser injetada: ${alturaNecessaria.toFixed(2)} m</p>`;
-            resultadoDiv.innerHTML += `<p>Volume a ser injetado: ${volumeInjetar.toFixed(2)} m³ (${volumeInjetarBBL.toFixed(2)} bbl)</p>`;
+            document.getElementById('resultado').innerText = resultado;
         }
     </script>
 </body>
