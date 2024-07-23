@@ -200,6 +200,8 @@
             const pressaoHidColuna = massaColuna * gravidade * profundidadeColuna;
             const pressaoHidAnular = massaAnular * gravidade * profundidadeAnular;
             const pressaoHidAnularAlvo = 1.1 * pressaoHidAnular;
+            const pressaoHidColuna_kgf = pressaoHidColuna * 0.1019716213;
+            const pressaoHidAnular_kgf = pressaoHidAnular * 0.1019716213;
 
             const xTotal = pressaoHidAnularAlvo / (massaColuna * gravidade);
             const alturaNecessaria = xTotal - profundidadeColuna;
@@ -220,8 +222,8 @@
                 resultadoDiv.innerHTML += `<p style="color: red;">Pressão hidrostática do anular maior do que da coluna, operação insegura. Necessário injetar ${volumeInjetarBBL.toFixed(2)} bbl com a UCAQ antes de prosseguir com a operação. Consultar engenharia antes de prosseguir.</p>`;
             }
 
-            resultadoDiv.innerHTML += `<p>Pressão hidrostática da coluna: ${pressaoHidColuna.toFixed(2)} Pa</p>`;
-            resultadoDiv.innerHTML += `<p>Pressão hidrostática do anular: ${pressaoHidAnular.toFixed(2)} Pa</p>`;
+            resultadoDiv.innerHTML += `<p>Pressão hidrostática da coluna: ${pressaoHidColuna_kgf.toFixed(2)} kgf/cm²</p>`;
+            resultadoDiv.innerHTML += `<p>Pressão hidrostática do anular: ${pressaoHidAnular_kgf.toFixed(2)} kgf/cm²</p>`;
             resultadoDiv.innerHTML += `<p>1.1 vezes a pressão hidrostática do anular: ${pressaoHidAnularAlvo.toFixed(2)} Pa</p>`;
             resultadoDiv.innerHTML += `<p>Altura total necessária da coluna de líquido para atingir 1.1 PHA: ${xTotal.toFixed(2)} m</p>`;
             resultadoDiv.innerHTML += `<p>Altura de líquido a ser injetada: ${alturaNecessaria.toFixed(2)} m</p>`;
