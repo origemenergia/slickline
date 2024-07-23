@@ -200,8 +200,8 @@
             const pressaoHidColuna = massaColuna * gravidade * profundidadeColuna;
             const pressaoHidAnular = massaAnular * gravidade * profundidadeAnular;
             const pressaoHidAnularAlvo = 1.1 * pressaoHidAnular;
-            const pressaoHidColuna_kgf = pressaoHidColuna * 0.1019716213;
-            const pressaoHidAnular_kgf = pressaoHidAnular * 0.1019716213;
+            const pressaoHidColuna_kgf = pressaoHidColuna / 98070;
+            const pressaoHidAnular_kgf = pressaoHidAnular / 98070;
 
             const xTotal = pressaoHidAnularAlvo / (massaColuna * gravidade);
             const alturaNecessaria = xTotal - profundidadeColuna;
