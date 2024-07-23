@@ -80,7 +80,7 @@
             display: none;
         }
         .calculator .logo {
-            width: 220px; /* Aumentado para 150px */
+            width: 220px;
             margin-bottom: 20px;
         }
         .calculator .error {
@@ -95,8 +95,8 @@
             margin-top: 20px;
         }
         .footer {
-            font-size: 10px; /* Fonte menor */
-            color: rgba(0, 0, 0, 0.6); /* Opacidade de 60% */
+            font-size: 10px;
+            color: rgba(0, 0, 0, 0.6);
             text-align: center;
             margin-top: 10px;
         }
@@ -106,11 +106,17 @@
     <div class="calculator">
         <img src="logo.png" alt="Origem Logo" class="logo">
         <h1>SLICKLINE | Equalização de Níveis de Líquido</h1>
-        
         <label for="profundidadePoco">Profundidade do Poço (m):</label>
         <input type="number" id="profundidadePoco" inputmode="decimal">
         <span class="error" id="errorProfundidadePoco"></span>
-        
+
+        <label for="diametroColuna">Diâmetro da Coluna (polegadas):</label>
+        <select id="diametroColuna">
+            <option value="2.375">2 3/8"</option>
+            <option value="2.875">2 7/8"</option>
+            <option value="3">3"</option>
+        </select>
+
         <label for="nivelColuna">Nível na Coluna (m):</label>
         <input type="number" id="nivelColuna" inputmode="decimal">
         <span class="error" id="errorNivelColuna"></span>
@@ -127,20 +133,20 @@
         <input type="number" id="pressaoColuna" inputmode="decimal">
         <span class="error" id="errorPressaoColuna"></span>
         
-        <label for="masseEspecificaConhecida">A massa específica dos fluidos é conhecida?</label>
-        <select id="masseEspecificaConhecida" onchange="mostrarMassaEspecifica()">
+        <label for="massasConhecidas">As massas específicas dos fluidos são conhecidas?</label>
+        <select id="massasConhecidas" onchange="mostrarMassas()">
             <option value="nao">Não</option>
             <option value="sim">Sim</option>
         </select>
         
-        <div id="masseEspecifica" class="hidden">
-            <label for="massaEspecificaAnular">Massa específica do fluido no Anular (kg/m³):</label>
-            <input type="number" id="massaEspecificaAnular" inputmode="decimal">
-            <span class="error" id="errorMassaEspecificaAnular"></span>
+        <div id="massas" class="hidden">
+            <label for="massaAnular">Massa específica do fluido no Anular (kg/m³):</label>
+            <input type="number" id="massaAnular" inputmode="decimal">
+            <span class="error" id="errorMassaAnular"></span>
             
-            <label for="massaEspecificaColuna">Massa específica do fluido na Coluna (kg/m³):</label>
-            <input type="number" id="massaEspecificaColuna" inputmode="decimal">
-            <span class="error" id="errorMassaEspecificaColuna"></span>
+            <label for="massaColuna">Massa específica do fluido na Coluna (kg/m³):</label>
+            <input type="number" id="massaColuna" inputmode="decimal">
+            <span class="error" id="errorMassaColuna"></span>
         </div>
         
         <button onclick="calcular()">Calcular</button>
@@ -150,13 +156,15 @@
         Todos os direitos reservados © 2024 Anália Ramila e Adlehr Gabriele | Origem Energia S.A.
     </div>
     <script>
-        function mostrarMassaEspecifica() {
-            const massaEspecificaDiv = document.getElementById('masseEspecifica');
-            const massaEspecificaConhecida = document.getElementById('masseEspecificaConhecida').value;
-            if (massaEspecificaConhecida === 'sim') {
-                massaEspecificaDiv.classList.remove('hidden');
+        const GRAVIDADE = 9.806;
+
+        function mostrarMassas() {
+            const massasDiv = document.getElementById('massas');
+            const massasConhecidas = document.getElementById('massasConhecidas').value;
+            if (massasConhecidas === 'sim') {
+                massasDiv.classList.remove('hidden');
             } else {
-                massaEspecificaDiv.classList.add('hidden');
+                massasDiv.classList.add('hidden');
             }
         }
 
@@ -175,10 +183,11 @@
             const nivelAnular = parseFloat(document.getElementById('nivelAnular').value);
             const pressaoAnular = parseFloat(document.getElementById('pressaoAnular').value);
             const pressaoColuna = parseFloat(document.getElementById('pressaoColuna').value);
-            const massaEspecificaConhecida = document.getElementById('masseEspecificaConhecida').value;
-
-            let massaEspecificaAnular = 1006.54; // massa específica padrão em kg/m³
-            let massaEspecificaColuna = 900; // massa específica padrão em kg/m³
+            const massasConhecidas = document.getElementById('massasConhecidas').value;
+            const diametroColuna = parseFloat(document.getElementById('diametroColuna').value);
+            
+            let massaAnular = 1006.54; // massa padrão em kg/m³
+            let massaColuna = 900; // massa padrão em kg/m³
 
             let isValid = true;
             isValid &= validarEntrada(profundidadePoco, 'errorProfundidadePoco');
@@ -187,48 +196,46 @@
             isValid &= validarEntrada(pressaoAnular, 'errorPressaoAnular');
             isValid &= validarEntrada(pressaoColuna, 'errorPressaoColuna');
 
-            if (massaEspecificaConhecida === 'sim') {
-                massaEspecificaAnular = parseFloat(document.getElementById('massaEspecificaAnular').value);
-                massaEspecificaColuna = parseFloat(document.getElementById('massaEspecificaColuna').value);
-                isValid &= validarEntrada(massaEspecificaAnular, 'errorMassaEspecificaAnular');
-                isValid &= validarEntrada(massaEspecificaColuna, 'errorMassaEspecificaColuna');
+            if (massasConhecidas === 'sim') {
+                massaAnular = parseFloat(document.getElementById('massaAnular').value);
+                massaColuna = parseFloat(document.getElementById('massaColuna').value);
+                isValid &= validarEntrada(massaAnular, 'errorMassaAnular');
+                isValid &= validarEntrada(massaColuna, 'errorMassaColuna');
             }
 
             if (!isValid) {
                 return;
             }
 
-            // Calcular a altura das colunas de líquido
-            const alturaColuna = profundidadePoco - nivelColuna;
-            const alturaAnular = profundidadePoco - nivelAnular;
+            const hAnular = profundidadePoco - nivelAnular;
+            const hColuna = profundidadePoco - nivelColuna;
+            const phaCalculada = (massaAnular * GRAVIDADE * hAnular) / 98066.5; // convertendo para kgf/cm²
+            const phcCalculada = (massaColuna * GRAVIDADE * hColuna) / 98066.5; // convertendo para kgf/cm²
+            const phcSegura = 1.1 * phaCalculada;
 
-            // Calcular a pressão hidrostática
-            const gravidade = 9.806; // m/s²
-            const pressaoHidColuna = massaEspecificaColuna * gravidade * alturaColuna / 10000 + pressaoColuna;
-            const pressaoHidAnular = massaEspecificaAnular * gravidade * alturaAnular / 10000 + pressaoAnular;
-
-            let resultado = '';
-            let cor = '';
-
-            if (pressaoHidColuna > pressaoHidAnular) {
-                if (pressaoHidColuna / pressaoHidAnular > 1.1) {
-                    resultado = 'Pressão hidrostática da coluna maior do que a do anular, operação segura.';
-                    cor = 'green';
-                } else {
-                    resultado = 'Pressão hidrostática da coluna ligeiramente maior do que a do anular. Consultar engenharia para saber se deve seguir a operação sem completar a coluna dado que o valor, apesar de positivo, está próximo da margem de erro.';
-                    cor = 'orange';
-                }
+            if (phcCalculada > phcSegura) {
+                document.getElementById('resultado').innerText = `Pressão hidrostática da coluna é maior que 1,1 vezes a do anular, a operação é segura. Pode prosseguir.`;
+                document.getElementById('resultado').style.color = "green";
+            } else if (phcCalculada > 0.9 * phaCalculada && phcCalculada < phcSegura) {
+                document.getElementById('resultado').innerText = `Pressão hidrostática da coluna está dentro de 10% da do anular, operação segura, mas consulte a engenharia antes de prosseguir.`;
+                document.getElementById('resultado').style.color = "orange";
             } else {
-                // Calcular o volume a ser injetado (X)
-                const pressaoHidAnularDesejada = pressaoHidAnular * 1.1;
-                const volumeInjetado = ((pressaoHidAnularDesejada - pressaoColuna) * 10000) / (massaEspecificaColuna * gravidade);
+                const alturaColunaNecessaria = (phcSegura * 98066.5) / (massaAnular * GRAVIDADE);
+                const alturaParaInjetar = alturaColunaNecessaria - hColuna;
 
-                resultado = `Pressão hidrostática do anular maior do que da coluna, operação insegura. Necessário injetar ${volumeInjetado.toFixed(2)} bbl com a UCAQ antes de prosseguir com a operação. Consultar engenharia antes de prosseguir.`;
-                cor = 'red';
+                // Convertendo alturaParaInjetar de metros para centímetros
+                const alturaParaInjetarCm = alturaParaInjetar * 100;
+                
+                // Calculando o volume necessário
+                const raioColuna = (diametroColuna * 2.54) / 2; // Convertendo polegadas para centímetros
+                const volumeParaInjetarCm3 = Math.PI * Math.pow(raioColuna, 2) * alturaParaInjetarCm;
+                
+                // Convertendo volume de cm³ para bbl (1 barril = 158987 cm³)
+                const volumeParaInjetarBbl = volumeParaInjetarCm3 / 158987;
+
+                document.getElementById('resultado').innerText = `Pressão hidrostática do anular maior do que da coluna, operação insegura. Necessário injetar ${volumeParaInjetarBbl.toFixed(2)} bbl com a UCAQ antes de prosseguir com a operação. Consultar engenharia antes de prosseguir.`;
+                document.getElementById('resultado').style.color = "red";
             }
-
-            document.getElementById('resultado').innerText = resultado;
-            document.getElementById('resultado').style.color = cor;
         }
     </script>
 </body>
