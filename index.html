@@ -269,10 +269,10 @@
             Pressão da Coluna: ${pressaoColuna} kgf/cm²<br>
             Massa específica do fluido no Anular: ${massaAnular} kg/m³<br>
             Massa específica do fluido na Coluna: ${massaColuna} kg/m³<br>
-            Pressão hidrostática no Anular: ${pha.toFixed(2)} Pa<br>
-            Pressão hidrostática na Coluna: ${phc.toFixed(2)/98066.5} kgf/cm²<br>
-            Pressão Total no Anular: ${pressaoTotalAnular.toFixed(2)/98066.5} kgf/cm²<br>
-            Pressão Total na Coluna: ${pressaoTotalColuna.toFixed(2)/98066.5} kgf/cm²<br>`;
+            Pressão hidrostática no Anular: ${pha/98066.5.toFixed(2)} kgf/cm²<br>
+            Pressão hidrostática na Coluna: ${phc/98066.5.toFixed(2)} kgf/cm²<br>
+            Pressão Total no Anular: ${pressaoTotalAnular/98066.5.toFixed(2)} kgf/cm²<br>
+            Pressão Total na Coluna: ${pressaoTotalColuna/98066.5.toFixed(2)} kgf/cm²<br>`;
 
             const alturaNecessaria = (1.1 * pressaoTotalAnular - pressaoTotalColuna) / (massaColuna * g);
             const diametroColuna = parseFloat(document.getElementById('diametro_coluna').value);
