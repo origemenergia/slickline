@@ -126,21 +126,21 @@
         </select>
 
         <label for="pi_igual">O PI indica que as pressões de anular e coluna são iguais?</label>
-        <select id="pi_igual" onchange="mostrarPressaoPI()">
-            <option value="nao">Não</option>
+        <select id="pi_igual" onchange="mostrarPressao()">
             <option value="sim">Sim</option>
+            <option value="não">Não</option>
         </select>
-
-        <div id="pressaoPI" class="hidden">
-            <label for="pressao_coluna">Pressão na Coluna (kgf/cm²):</label>
-            <input type="number" id="pressao_coluna" inputmode="decimal">
-            <span class="error" id="errorPressaoColuna"></span>
-
-            <label for="pressao_anular">Pressão no Anular (kgf/cm²):</label>
+        
+        <div id="pressao" class="hidden">
+            <label for="pressao_anular">Pressão do Anular (kgf/cm²):</label>
             <input type="number" id="pressao_anular" inputmode="decimal">
             <span class="error" id="errorPressaoAnular"></span>
+            
+            <label for="pressao_coluna">Pressão da Coluna (kgf/cm²):</label>
+            <input type="number" id="pressao_coluna" inputmode="decimal">
+            <span class="error" id="errorPressaoColuna"></span>
         </div>
-
+        
         <label for="massaConhecida">A massa específica dos fluidos é conhecida?</label>
         <select id="massaConhecida" onchange="mostrarMassas()">
             <option value="nao">Não</option>
@@ -164,13 +164,13 @@
         Todos os direitos reservados © 2024 Anália Ramila e Adlehr Gabriele | Origem Energia S.A.
     </div>
     <script>
-        function mostrarPressaoPI() {
-            const pressaoPIDiv = document.getElementById('pressaoPI');
+        function mostrarPressao() {
+            const pressaoDiv = document.getElementById('pressao');
             const piIgual = document.getElementById('pi_igual').value;
-            if (piIgual === 'sim') {
-                pressaoPIDiv.classList.remove('hidden');
+            if (piIgual === 'não') {
+                pressaoDiv.classList.remove('hidden');
             } else {
-                pressaoPIDiv.classList.add('hidden');
+                pressaoDiv.classList.add('hidden');
             }
         }
 
@@ -198,70 +198,72 @@
             const nivelColuna = parseFloat(document.getElementById('nivel_coluna').value);
             const nivelAnular = parseFloat(document.getElementById('nivel_anular').value);
             const massaConhecida = document.getElementById('massaConhecida').value;
-            const diametroColuna = parseFloat(document.getElementById('diametro_coluna').value);
             const piIgual = document.getElementById('pi_igual').value;
 
-            let massaColuna = 900; // valor padrão em kg/m³
-            let massaAnular = 1006.54; // valor padrão em kg/m³
+            let massaAnular, massaColuna, pressaoAnular, pressaoColuna;
 
-            let pressaoColuna = 0;
-            let pressaoAnular = 0;
+            // Validando entradas principais
+            if (!validarEntrada(profundidade, 'errorProfundidade') ||
+                !validarEntrada(nivelColuna, 'errorNivelColuna') ||
+                !validarEntrada(nivelAnular, 'errorNivelAnular')) {
+                return;
+            }
 
-            let isValid = true;
-            isValid &= validarEntrada(profundidade, 'errorProfundidade');
-            isValid &= validarEntrada(nivelColuna, 'errorNivelColuna');
-            isValid &= validarEntrada(nivelAnular, 'errorNivelAnular');
-
-            if (piIgual === 'sim') {
-                pressaoColuna = parseFloat(document.getElementById('pressao_coluna').value) * 98066.5; // converter de kgf/cm² para Pa
-                pressaoAnular = parseFloat(document.getElementById('pressao_anular').value) * 98066.5; // converter de kgf/cm² para Pa
-                isValid &= validarEntrada(pressaoColuna, 'errorPressaoColuna');
-                isValid &= validarEntrada(pressaoAnular, 'errorPressaoAnular');
+            if (piIgual === 'não') {
+                pressaoAnular = parseFloat(document.getElementById('pressao_anular').value);
+                pressaoColuna = parseFloat(document.getElementById('pressao_coluna').value);
+                
+                if (!validarEntrada(pressaoAnular, 'errorPressaoAnular') ||
+                    !validarEntrada(pressaoColuna, 'errorPressaoColuna')) {
+                    return;
+                }
+            } else {
+                pressaoAnular = 0;
+                pressaoColuna = 0;
             }
 
             if (massaConhecida === 'sim') {
                 massaAnular = parseFloat(document.getElementById('massa_anular').value);
                 massaColuna = parseFloat(document.getElementById('massa_coluna').value);
-                isValid &= validarEntrada(massaAnular, 'errorMassaAnular');
-                isValid &= validarEntrada(massaColuna, 'errorMassaColuna');
-            }
-
-            if (!isValid) {
-                document.getElementById('resultado').innerText = '';
-                return;
-            }
-
-            const g = 9.80665; // aceleração da gravidade em m/s²
-
-            const densidadeRelativaAnular = massaAnular / 1000;
-            const densidadeRelativaColuna = massaColuna / 1000;
-
-            const pressaoHidraulicaAnular = densidadeRelativaAnular * g * (profundidade - nivelAnular);
-            const pressaoHidraulicaColuna = densidadeRelativaColuna * g * (profundidade - nivelColuna);
-
-            const pressaoTotalAnular = pressaoHidraulicaAnular + pressaoAnular;
-            const pressaoTotalColuna = pressaoHidraulicaColuna + pressaoColuna;
-
-            const fatorSeguranca = 1.1 * pressaoTotalAnular;
-
-            let resultado = "";
-
-            if (pressaoTotalColuna > fatorSeguranca) {
-                resultado = "Operação segura. Nenhuma ação necessária.";
-                document.getElementById('resultado').style.color = 'green';
-            } else if (pressaoTotalColuna > pressaoTotalAnular) {
-                resultado = "Operação segura, mas está dentro de 10% do limite. Consulte a engenharia.";
-                document.getElementById('resultado').style.color = 'yellow';
+                
+                if (!validarEntrada(massaAnular, 'errorMassaAnular') ||
+                    !validarEntrada(massaColuna, 'errorMassaColuna')) {
+                    return;
+                }
             } else {
-                const alturaNecessaria = (fatorSeguranca - pressaoTotalColuna) / (densidadeRelativaColuna * g);
-                const areaColuna = Math.PI * Math.pow(diametroColuna / 2, 2) * 0.00064516; // conversão de polegadas quadradas para metros quadrados
-                const volumeNecessario = alturaNecessaria * areaColuna * 6.28981; // conversão de metros cúbicos para barris
-
-                resultado = `Operação insegura. Necessário injetar aproximadamente ${volumeNecessario.toFixed(2)} barris de fluido.`;
-                document.getElementById('resultado').style.color = 'red';
+                massaAnular = 920;
+                massaColuna = 970;
             }
 
-            document.getElementById('resultado').innerText = resultado;
+            const g = 9.81;
+            const profundidadeColuna = profundidade - nivelColuna;
+            const profundidadeAnular = profundidade - nivelAnular;
+
+            const phc = profundidadeColuna * massaColuna * g;
+            const pha = profundidadeAnular * massaAnular * g;
+
+            // Converting kgf/cm² to Pa (1 kgf/cm² = 98066.5 Pa)
+            const pressaoAnularPa = pressaoAnular * 98066.5;
+            const pressaoColunaPa = pressaoColuna * 98066.5;
+
+            const pressaoTotalAnular = phc + pressaoAnularPa;
+            const pressaoTotalColuna = pha + pressaoColunaPa;
+
+            let resultadoTexto;
+
+            if (pressaoTotalColuna > 1.1 * pressaoTotalAnular) {
+                resultadoTexto = 'A operação é segura.';
+            } else if (pressaoTotalColuna > pressaoTotalAnular) {
+                resultadoTexto = 'A operação é segura, mas consulte a engenharia.';
+            } else {
+                const alturaNecessaria = (1.1 * pressaoTotalAnular - pressaoTotalColuna) / (massaColuna * g);
+                const diametroColuna = parseFloat(document.getElementById('diametro_coluna').value);
+                const volumeNecessario = (Math.PI * Math.pow((diametroColuna * 0.0254) / 2, 2) * alturaNecessaria) / 0.158987;
+
+                resultadoTexto = `A operação não é segura. É necessário injetar aproximadamente ${volumeNecessario.toFixed(2)} bbl na coluna para equalizar as pressões.`;
+            }
+
+            document.getElementById('resultado').innerText = resultadoTexto;
         }
     </script>
 </body>
