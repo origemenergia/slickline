@@ -291,14 +291,7 @@
             const prof_restante = prof_necessaria - profundidade;
             const pha_nova = prof_restante * massaColuna * g;
             const despressurizar = (pha_nova / 98066.5).toFixed(2);
-            const nova_pa = pressaoAnular - despressurizar
-
-            if (prof_necessaria > profundidade) {
-                resultadoTexto = `<span class="verde">Pressão total da coluna maior do que do que a anular considerando margem de erro, operação segura.</span>`;
-            } else if (pressaoTotalColuna > pressaoTotalAnular) {
-                resultadoTexto = `<span class="laranja">Pressão hidrostática da coluna ligeiramente maior do que a do anular. Consultar engenharia para saber se deve seguir a operação sem completar a coluna dado que o valor, apesar de positivo, está próximo da margem de erro.</span>`;
-                memorialTexto += `
-            
+            const nova_pa = pressaoAnular - despressurizar            
 
             if (pressaoTotalColuna > 1.1 * pressaoTotalAnular) {
                 resultadoTexto = `<span class="verde">Pressão total da coluna maior do que do que a anular considerando margem de erro, operação segura.</span>`;
