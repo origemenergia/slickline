@@ -157,11 +157,11 @@
         </select>
         
         <div id="massas" class="hidden">
-            <label for="massa_anular">Massa específica do fluido no Anular (kg/m³):</label>
+            <label for="massa_anular">Massa específica do fluido no Anular (ppg):</label>
             <input type="number" id="massa_anular" inputmode="decimal">
             <span class="error" id="errorMassaAnular"></span>
             
-            <label for="massa_coluna">Massa específica do fluido na Coluna (kg/m³):</label>
+            <label for="massa_coluna">Massa específica do fluido na Coluna (ppg):</label>
             <input type="number" id="massa_coluna" inputmode="decimal">
             <span class="error" id="errorMassaColuna"></span>
         </div>
@@ -233,8 +233,8 @@
             }
 
             if (massaConhecida === 'sim') {
-                massaAnular = parseFloat(document.getElementById('massa_anular').value);
-                massaColuna = parseFloat(document.getElementById('massa_coluna').value);
+                massaAnular = parseFloat(document.getElementById('massa_anular').value) * 119,8;
+                massaColuna = parseFloat(document.getElementById('massa_coluna').value) * 119,8;
                 
                 if (!validarEntrada(massaAnular, 'errorMassaAnular') ||
                     !validarEntrada(massaColuna, 'errorMassaColuna')) {
@@ -272,8 +272,8 @@
             Nível no Anular: ${nivelAnular} m<br>
             Pressão do Anular: ${pressaoAnular} kgf/cm²<br>
             Pressão da Coluna: ${pressaoColuna} kgf/cm²<br>
-            Massa específica do fluido no Anular: ${massaAnular} kg/m³<br>
-            Massa específica do fluido na Coluna: ${massaColuna} kg/m³<br>
+            Massa específica do fluido no Anular: ${massaAnular} ppg<br>
+            Massa específica do fluido na Coluna: ${massaColuna} ppg<br>
             Pressão hidrostática no Anular: ${pha_convertida} kgf/cm²<br>
             Pressão hidrostática na Coluna: ${phc_convertida} kgf/cm²<br>
             Pressão Total no Anular: ${pressatotalanularconvertida} kgf/cm²<br>
