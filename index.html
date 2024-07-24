@@ -115,7 +115,7 @@
     <div class="calculator">
         <img src="logo.png" alt="Origem Logo" class="logo">
         <h1>SLICKLINE | Equalização de Níveis de Líquido</h1>
-        <label for="profundidade">Profundidade do poço (m):</label>
+        <label for="profundidade">Profundidade vertical (TVD) do poço (m):</label>
         <input type="number" id="profundidade" inputmode="decimal">
         <span class="error" id="errorProfundidade"></span>
 
@@ -267,7 +267,7 @@
             let resultadoTexto;
             let memorialTexto = `
             <strong>Memorial de Cálculo:</strong><br>
-            Profundidade do poço: ${profundidade} m<br>
+            Profundidade vertical (TVD) do poço: ${profundidade} m<br>
             Nível na Coluna: ${nivelColuna} m<br>
             Nível no Anular: ${nivelAnular} m<br>
             Pressão do Anular: ${pressaoAnular} kgf/cm²<br>
