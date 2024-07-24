@@ -259,6 +259,11 @@
             const pressaoTotalAnular = pha + pressaoAnularPa;
             const pressaoTotalColuna = phc + pressaoColunaPa;
 
+            const pha_convertida = (pha / 98066.5).toFixed(2);
+            const phc_convertida = (phc / 98066.5).toFixed(2);
+            const pressatotalanularconvertida = (pressaoTotalAnular / 98066.5).toFixed(2);
+            const pressototalcolunaconvertida = (pressaoTotalColuna / 98066.5).toFixed(2);
+
             let resultadoTexto;
             let memorialTexto = `
             <strong>Memorial de Cálculo:</strong><br>
@@ -269,10 +274,10 @@
             Pressão da Coluna: ${pressaoColuna} kgf/cm²<br>
             Massa específica do fluido no Anular: ${massaAnular} kg/m³<br>
             Massa específica do fluido na Coluna: ${massaColuna} kg/m³<br>
-            Pressão hidrostática no Anular: ${pha/98066.5.toFixed(2)} kgf/cm²<br>
-            Pressão hidrostática na Coluna: ${phc/98066.5.toFixed(2)} kgf/cm²<br>
-            Pressão Total no Anular: ${pressaoTotalAnular/98066.5.toFixed(2)} kgf/cm²<br>
-            Pressão Total na Coluna: ${pressaoTotalColuna/98066.5.toFixed(2)} kgf/cm²<br>`;
+            Pressão hidrostática no Anular: ${pha_convertida} kgf/cm²<br>
+            Pressão hidrostática na Coluna: ${phc_convertida} kgf/cm²<br>
+            Pressão Total no Anular: ${pressatotalanularconvertida} kgf/cm²<br>
+            Pressão Total na Coluna: ${pressototalcolunaconvertida} kgf/cm²<br>`;
 
             const alturaNecessaria = (1.1 * pressaoTotalAnular - pressaoTotalColuna) / (massaColuna * g);
             const diametroColuna = parseFloat(document.getElementById('diametro_coluna').value);
