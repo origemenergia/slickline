@@ -269,20 +269,24 @@
             Pressão da Coluna: ${pressaoColuna} kgf/cm²<br>
             Massa específica do fluido no Anular: ${massaAnular} kg/m³<br>
             Massa específica do fluido na Coluna: ${massaColuna} kg/m³<br>
-            Pressão hidrostática no Anular (Pa): ${pha.toFixed(2)} Pa<br>
-            Pressão hidrostática na Coluna (Pa): ${phc.toFixed(2)} Pa<br>
-            Pressão Total no Anular (Pa): ${pressaoTotalAnular.toFixed(2)} Pa<br>
-            Pressão Total na Coluna (Pa): ${pressaoTotalColuna.toFixed(2)} Pa<br>`;
+            Pressão hidrostática no Anular: ${pha.toFixed(2)} Pa<br>
+            Pressão hidrostática na Coluna: ${phc.toFixed(2)/98066.5} kgf/cm²<br>
+            Pressão Total no Anular: ${pressaoTotalAnular.toFixed(2)/98066.5} kgf/cm²<br>
+            Pressão Total na Coluna: ${pressaoTotalColuna.toFixed(2)/98066.5} kgf/cm²<br>`;
+
+            const alturaNecessaria = (1.1 * pressaoTotalAnular - pressaoTotalColuna) / (massaColuna * g);
+            const diametroColuna = parseFloat(document.getElementById('diametro_coluna').value);
+            const volumeNecessario = (Math.PI * Math.pow((diametroColuna * 0.0254) / 2, 2) * alturaNecessaria) / 0.158987;
 
             if (pressaoTotalColuna > 1.1 * pressaoTotalAnular) {
-                resultadoTexto = `<span class="verde">A operação é segura.</span>`;
+                resultadoTexto = `<span class="verde">Pressão total da coluna maior do que do que a anular considerando margem de erro, operação segura.</span>`;
             } else if (pressaoTotalColuna > pressaoTotalAnular) {
-                resultadoTexto = `<span class="laranja">A operação é segura, mas consulte a engenharia.</span>`;
+                resultadoTexto = `<span class="laranja">Pressão hidrostática da coluna ligeiramente maior do que a do anular. Consultar engenharia para saber se deve seguir a operação sem completar a coluna dado que o valor, apesar de positivo, está próximo da margem de erro.</span>`;
+                memorialTexto += `
+                <strong>Detalhamento adicional:</strong><br>
+                Altura necessária para equalizar considerando margem de erro: ${alturaNecessaria.toFixed(2)} m<br>
+                Volume necessário para injetar na coluna considerando margem de erro: ${volumeNecessario.toFixed(2)} bbl<br>`;
             } else {
-                const alturaNecessaria = (1.1 * pressaoTotalAnular - pressaoTotalColuna) / (massaColuna * g);
-                const diametroColuna = parseFloat(document.getElementById('diametro_coluna').value);
-                const volumeNecessario = (Math.PI * Math.pow((diametroColuna * 0.0254) / 2, 2) * alturaNecessaria) / 0.158987;
-
                 resultadoTexto = `<span class="vermelho">A operação não é segura. É necessário injetar aproximadamente ${volumeNecessario.toFixed(2)} bbl na coluna para equalizar as pressões.</span>`;
                 memorialTexto += `
                 <strong>Detalhamento adicional:</strong><br>
