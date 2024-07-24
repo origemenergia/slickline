@@ -294,7 +294,7 @@
             const nova_pa = pressaoAnular - despressurizar            
 
             if (pressaoTotalColuna > 1.1 * pressaoTotalAnular) {
-                resultadoTexto = `<span class="verde">Pressão total da coluna maior do que do que a anular considerando margem de erro, operação segura.</span>`;
+                resultadoTexto = `<span class="verde">Pressão total da coluna maior do que a anular considerando margem de erro, operação segura.</span>`;
             } else if (pressaoTotalColuna > pressaoTotalAnular) {
                 resultadoTexto = `<span class="laranja">Pressão hidrostática da coluna ligeiramente maior do que a do anular. Consultar engenharia para saber se deve seguir a operação sem completar a coluna dado que o valor, apesar de positivo, está próximo da margem de erro.</span>`;
                 memorialTexto += `
@@ -308,15 +308,15 @@
                     <strong>Detalhamento adicional:</strong><br>
                     Altura necessária para equalizar: ${alturaNecessaria.toFixed(2)} m<br>
                     Volume necessário para injetar na coluna: ${volumeNecessario.toFixed(2)} bbl<br>`;
-                }else if (prof_necessaria > profundidade) {
+                } else if (prof_necessaria > profundidade) {
                     resultadoTexto = `<span class="vermelho">A operação não é segura. É necessário completar totalmente a coluna injetando ${volumeNecessario_completar.toFixed(2)} bbl e despressurizar o anular em pelo menos ${despressurizar} kgf/cm².</span>`;
                     memorialTexto += `
                     <strong>Detalhamento adicional:</strong><br>
-                    Volume necessário para completar a coluna: ${volumeNecessario_completar.toFixed(2)} bbl<br>`;
+                    Volume necessário para completar a coluna: ${volumeNecessario_completar.toFixed(2)} bbl<br>
                     Necessário despressurizar o anular em ${despressurizar} kgf/cm², indo de ${pressaoAnular} até ${nova_pa}<br>`;
                 }
-                
             }
+
 
             document.getElementById('resultado').innerHTML = resultadoTexto;
             document.getElementById('memorial').innerHTML = memorialTexto;
