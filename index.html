@@ -222,86 +222,85 @@
             if (piIgual === 'não') {
                 pressaoAnular = parseFloat(document.getElementById('pressao_anular').value);
                 pressaoColuna = parseFloat(document.getElementById('pressao_coluna').value);
-                
+
+                // Validando entradas de pressão
                 if (!validarEntrada(pressaoAnular, 'errorPressaoAnular') ||
                     !validarEntrada(pressaoColuna, 'errorPressaoColuna')) {
                     return;
                 }
-            } else {
-                pressaoAnular = 0;
-                pressaoColuna = 0;
             }
 
             if (massaConhecida === 'sim') {
                 massaAnular = parseFloat(document.getElementById('massa_anular').value);
                 massaColuna = parseFloat(document.getElementById('massa_coluna').value);
-                
+
+                // Validando entradas de massa específica
                 if (!validarEntrada(massaAnular, 'errorMassaAnular') ||
                     !validarEntrada(massaColuna, 'errorMassaColuna')) {
                     return;
                 }
             } else {
-                massaAnular = 1006.54;
-                massaColuna = 900;
+                massaAnular = 900; // kg/m³ valor padrão
+                massaColuna = 1000; // kg/m³ valor padrão
             }
 
-            const g = 9.801;
-            const profundidadeColuna = profundidade - nivelColuna;
-            const profundidadeAnular = profundidade - nivelAnular;
+            const g = 9.81; // Aceleração devido à gravidade em m/s²
 
-            const phc = profundidadeColuna * massaColuna * g;
-            const pha = profundidadeAnular * massaAnular * g;
+            // Cálculo das pressões hidrostáticas
+            const pha = (piIgual === 'não') ? pressaoAnular : massaAnular * g * nivelAnular / 100000; // Convertendo para bar
+            const phc = (piIgual === 'não') ? pressaoColuna : massaColuna * g * nivelColuna / 100000; // Convertendo para bar
 
-            // Converting kgf/cm² to Pa (1 kgf/cm² = 98066.5 Pa)
-            const pressaoAnularPa = pressaoAnular * 98066.5;
-            const pressaoColunaPa = pressaoColuna * 98066.5;
+            // Cálculo da profundidade equivalente
+            const profundidadeEquivalente = (phc * 100000) / (massaAnular * g); // Convertendo para metros
 
-            const pressaoTotalAnular = pha + pressaoAnularPa;
-            const pressaoTotalColuna = phc + pressaoColunaPa;
+            // Diâmetros da coluna em polegadas para metros
+            const diametros = {
+                '2.375': 0.060325,
+                '2.875': 0.073025,
+                '3': 0.0762
+            };
+            const diametroColuna = parseFloat(diametros[document.getElementById('diametro_coluna').value]);
 
-            const pha_convertida = (pha / 98066.5).toFixed(2);
-            const phc_convertida = (phc / 98066.5).toFixed(2);
-            const pressatotalanularconvertida = (pressaoTotalAnular / 98066.5).toFixed(2);
-            const pressototalcolunaconvertida = (pressaoTotalColuna / 98066.5).toFixed(2);
-
-            let resultadoTexto;
-            let memorialTexto = `
-            <strong>Memorial de Cálculo:</strong><br>
-            Profundidade vertical (TVD) do poço: ${profundidade} m<br>
-            Nível na Coluna: ${nivelColuna} m<br>
-            Nível no Anular: ${nivelAnular} m<br>
-            Pressão do Anular: ${pressaoAnular} kgf/cm²<br>
-            Pressão da Coluna: ${pressaoColuna} kgf/cm²<br>
-            Massa específica do fluido no Anular: ${massaAnular} kg/m³<br>
-            Massa específica do fluido na Coluna: ${massaColuna} kg/m³<br>
-            Pressão hidrostática no Anular: ${pha_convertida} kgf/cm²<br>
-            Pressão hidrostática na Coluna: ${phc_convertida} kgf/cm²<br>
-            Pressão Total no Anular: ${pressatotalanularconvertida} kgf/cm²<br>
-            Pressão Total na Coluna: ${pressototalcolunaconvertida} kgf/cm²<br>`;
-
-            const alturaNecessaria = (1.1 * pressaoTotalAnular - pressaoTotalColuna) / (massaColuna * g);
-            const diametroColuna = parseFloat(document.getElementById('diametro_coluna').value);
-            const volumeNecessario = (Math.PI * Math.pow((diametroColuna * 0.0254) / 2, 2) * alturaNecessaria) / 0.158987;
-
-            if (pressaoTotalColuna > 1.1 * pressaoTotalAnular) {
-                resultadoTexto = `<span class="verde">Pressão total da coluna maior do que do que a anular considerando margem de erro, operação segura.</span>`;
-            } else if (pressaoTotalColuna > pressaoTotalAnular) {
-                resultadoTexto = `<span class="laranja">Pressão hidrostática da coluna ligeiramente maior do que a do anular. Consultar engenharia para saber se deve seguir a operação sem completar a coluna dado que o valor, apesar de positivo, está próximo da margem de erro.</span>`;
-                memorialTexto += `
-                <strong>Detalhamento adicional:</strong><br>
-                Altura necessária para equalizar considerando margem de erro: ${alturaNecessaria.toFixed(2)} m<br>
-                Volume necessário para injetar na coluna considerando margem de erro: ${volumeNecessario.toFixed(2)} bbl<br>`;
+            if (phc > 1.1 * pha) {
+                document.getElementById('resultado').innerText = 'Operação segura.';
+                document.getElementById('resultado').className = 'verde';
+            } else if (Math.abs(phc - pha) <= 0.1 * pha) {
+                document.getElementById('resultado').innerText = 'Operação segura, mas consulte a engenharia.';
+                document.getElementById('resultado').className = 'laranja';
             } else {
-                resultadoTexto = `<span class="vermelho">A operação não é segura. É necessário injetar aproximadamente ${volumeNecessario.toFixed(2)} bbl na coluna para equalizar as pressões.</span>`;
-                memorialTexto += `
-                <strong>Detalhamento adicional:</strong><br>
-                Altura necessária para equalizar: ${alturaNecessaria.toFixed(2)} m<br>
-                Volume necessário para injetar na coluna: ${volumeNecessario.toFixed(2)} bbl<br>`;
-            }
+                // Cálculo da altura da coluna necessária para atingir 1,1*pha
+                const alturaNecessaria = (1.1 * pha * 100000) / (massaColuna * g);
 
-            document.getElementById('resultado').innerHTML = resultadoTexto;
-            document.getElementById('memorial').innerHTML = memorialTexto;
+                // Soma da altura necessária e profundidade da coluna
+                const alturaTotal = alturaNecessaria + profundidadeEquivalente;
+
+                if (alturaTotal <= profundidade) {
+                    const alturaAdicional = alturaNecessaria - nivelColuna;
+                    const volumeLiqNecessario = alturaAdicional * Math.PI * Math.pow(diametroColuna / 2, 2); // volume em m³
+                    const volumeLiqNecessarioBBL = volumeLiqNecessario * 6.28981; // Convertendo m³ para barris
+
+                    document.getElementById('resultado').innerText = 'A pressão hidrostática da coluna é menor que 1.1 vezes a do anular. Para equalizar, injete ' + volumeLiqNecessarioBBL.toFixed(2) + ' barris de líquido na coluna.';
+                    document.getElementById('resultado').className = 'vermelho';
+                } else {
+                    // Calcular o volume máximo que a coluna pode suportar até a profundidade TVD
+                    const alturaMaximaInjetar = profundidade - nivelColuna;
+                    const volumeMaximoInjetar = alturaMaximaInjetar * Math.PI * Math.pow(diametroColuna / 2, 2); // volume em m³
+                    const volumeMaximoInjetarBBL = volumeMaximoInjetar * 6.28981; // Convertendo m³ para barris
+
+                    // Calcular a pressão a ser despressurizada no anular
+                    const hRestante = alturaTotal - profundidade;
+                    const pressaoASerDespressurizada = (massaColuna * g * hRestante) / 100000; // Convertendo para bar
+                    const pressaoASerDespressurizadaKgfCm2 = pressaoASerDespressurizada * 1.01972; // Convertendo bar para kgf/cm²
+
+                    document.getElementById('resultado').innerText = 'A pressão hidrostática da coluna é menor que 1.1 vezes a do anular. ' +
+                        'Para equalizar, injete ' + volumeMaximoInjetarBBL.toFixed(2) + ' barris de líquido na coluna e despressurize o anular em ' +
+                        pressaoASerDespressurizadaKgfCm2.toFixed(2) + ' kgf/cm² (de ' + pressaoAnular.toFixed(2) + ' para ' +
+                        (pressaoAnular - pressaoASerDespressurizadaKgfCm2).toFixed(2) + ' kgf/cm²).';
+                    document.getElementById('resultado').className = 'vermelho';
+                }
+            }
         }
     </script>
 </body>
 </html>
+
