@@ -263,6 +263,9 @@
             const phc_convertida = (phc / 98066.5).toFixed(2);
             const pressatotalanularconvertida = (pressaoTotalAnular / 98066.5).toFixed(2);
             const pressototalcolunaconvertida = (pressaoTotalColuna / 98066.5).toFixed(2);
+
+            const massaAnular_convertida = (massaAnular / 119.8).toFixed(2);
+            const massaColuna_convertida = (massaColuna / 119.8).toFixed(2);
             
             let resultadoTexto;
             let memorialTexto = `
@@ -272,8 +275,8 @@
             Nível no Anular: ${nivelAnular} m<br>
             Pressão do Anular: ${pressaoAnular} kgf/cm²<br>
             Pressão da Coluna: ${pressaoColuna} kgf/cm²<br>
-            Massa específica do fluido no Anular: ${massaAnular} ppg<br>
-            Massa específica do fluido na Coluna: ${massaColuna} ppg<br>
+            Massa específica do fluido no Anular: ${massaAnular_convertida} ppg<br>
+            Massa específica do fluido na Coluna: ${massaColuna_convertida} ppg<br>
             Pressão hidrostática no Anular: ${pha_convertida} kgf/cm²<br>
             Pressão hidrostática na Coluna: ${phc_convertida} kgf/cm²<br>
             Pressão Total no Anular: ${pressatotalanularconvertida} kgf/cm²<br>
